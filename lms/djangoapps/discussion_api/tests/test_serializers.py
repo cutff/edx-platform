@@ -440,15 +440,3 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
         data["type"] = "invalid_type"
         serializer = ThreadSerializer(data=data)
         self.assertFalse(serializer.is_valid())
-
-    @ddt.data("True", "False")
-    def test_pinned(self, pinned_val):
-        data = dict(pinned=pinned_val, **self.minimal_data)
-        self.save_and_reserialize(data)
-        self.assertEqual(httpretty.last_request().parsed_body["pinned"], [pinned_val])
-
-    @ddt.data("True", "False")
-    def test_closed(self, closed_val):
-        data = dict(closed=closed_val, **self.minimal_data)
-        self.save_and_reserialize(data)
-        self.assertEqual(httpretty.last_request().parsed_body["closed"], [closed_val])
