@@ -10,7 +10,7 @@
   background: $footer-bg;
   clear: both;
 
-  footer {
+  footer#footer-openedx {
     @include clearfix();
     @include box-sizing(border-box);
     max-width: grid-width(12);

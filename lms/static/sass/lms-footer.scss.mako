@@ -23,9 +23,8 @@
 % endif
 
 footer#footer-openedx {
+    @import 'base/reset';
     @import 'base/extends';
-
-    // base - starter
     @import 'base/base';
 }
 
