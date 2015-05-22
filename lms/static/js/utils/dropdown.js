@@ -43,7 +43,6 @@ var edx = edx || {},
             },
 
             handlerIsAction: function(key, menu, focused, e) {
-                e.preventDefault();
 
                 if (key === 38) { // UP
                     dropdown.previousMenuItemLink(focused, menu);
@@ -53,7 +52,6 @@ var edx = edx || {},
             },
 
             handlerIsButton: function(key, el, e) {
-                e.preventDefault();
 
                 if (key === 40 || key === 13) { // DOWN or ENTER
                     dropdown.openDropdownMenu(el);
@@ -61,7 +59,6 @@ var edx = edx || {},
             },
 
             handlerIsMenu: function(key, menu, e) {
-                e.preventDefault();
 
                 if (key === 40) { // DOWN
                     dropdown.focusFirstItem(menu);
@@ -72,7 +69,12 @@ var edx = edx || {},
                 dropdown.opts.page.on('keydown', function(e) {
                     var keyCode = e.keyCode,
                         focused = $(e.currentTarget.activeElement),
-                        items, menu;
+                        items, menu, 
+                        keyArray = [13, 38, 40];
+
+                    if ($.inArray(keyCode, keyArray)) {
+                        e.preventDefault();
+                    }
 
                     if (27 === keyCode) {
                         // When the ESC key is pressed, close all menus
