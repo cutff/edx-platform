@@ -32,7 +32,9 @@ var edx = edx || {},
             },
 
             listenForClick: function() {
-                dropdown.opts.button.on('click', function() {
+                dropdown.opts.button.on('click', function(e) {
+                    e.preventDefault();
+
                     dropdown.closeDropdownMenus(); // close any open menus
                     dropdown.openDropdownMenu($(this)); // then open the chosen menu
                 });
@@ -73,6 +75,7 @@ var edx = edx || {},
                         keyArray = [13, 38, 40];
 
                     if ($.inArray(keyCode, keyArray)) {
+                        // Prevent default behavior if one of our trigger keys
                         e.preventDefault();
                     }
 
