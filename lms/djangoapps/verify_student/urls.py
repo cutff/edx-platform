@@ -96,6 +96,18 @@ urlpatterns = patterns(
     ),
 
     url(
+        r'^reverification_confirmation$',
+        views.reverification_submission_confirmation,
+        name="verify_student_reverification_confirmation"
+    ),
+
+    url(
+        r'^reverification_window_expired$',
+        views.reverification_window_expired,
+        name="verify_student_reverification_window_expired"
+    ),
+
+    url(
         r'^toggle_failed_banner_off$',
         views.toggle_failed_banner_off,
         name="verify_student_toggle_failed_banner_off"
