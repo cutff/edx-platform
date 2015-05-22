@@ -1117,14 +1117,6 @@ def reverification_submission_confirmation(_request):
 
 
 @login_required
-def midcourse_reverification_confirmation(_request):  # pylint: disable=invalid-name
-    """
-    Shows the user a confirmation page if the submission to SoftwareSecure was successful
-    """
-    return render_to_response("verify_student/midcourse_reverification_confirmation.html")
-
-
-@login_required
 def reverification_window_expired(_request):
     """
     Displays an error page if a student tries to submit a reverification, but the window
