@@ -7,9 +7,9 @@ from django.http import HttpResponse, Http404
 from django.utils import translation
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response
+from pipeline_mako import compressed_css
 import student.views
 from student.models import CourseEnrollment
 import courseware.views
@@ -124,11 +124,11 @@ def _render_footer_html(show_openedx_logo):
     """
     bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
     version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
-    css_name = u"css/{name}".format(name=settings.FOOTER_CSS[version][bidi])
+    css_name = settings.FOOTER_CSS[version][bidi]
 
     context = {
         'hide_openedx_link': not show_openedx_logo,
-        'footer_css_url': staticfiles_storage.url(css_name),
+        'footer_css': compressed_css(css_name),
         'bidi': bidi,
     }
     return (

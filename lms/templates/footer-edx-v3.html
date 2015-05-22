@@ -66,8 +66,8 @@
       </div>
     </div>
 </footer>
-% if footer_css_url:
-<link type="text/css" rel="stylesheet" href="${footer_css_url}"></link>
+% if footer_css:
+  ${footer_css}
 % endif
 <script type="text/javascript" src="${static.url('js/footer-edx.js')}"></script>
 

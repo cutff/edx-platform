@@ -1059,12 +1059,12 @@ FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
 # version of the CSS to serve.
 FOOTER_CSS = {
     "openedx": {
-        "ltr": "lms-footer.css",
-        "rtl": "lms-footer-rtl.css",
+        "ltr": "style-lms-footer",
+        "rtl": "style-lms-footer-rtl",
     },
     "edx": {
-        "ltr": "lms-footer-edx.css",
-        "rtl": "lms-footer-edx-rtl.css",
+        "ltr": "style-lms-footer-edx",
+        "rtl": "style-lms-footer-edx-rtl",
     },
 }
 
@@ -1368,29 +1368,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
     },
-    'style-footer': {
+    FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
             'sass/lms-footer.css',
         ],
-        'output_filename': path("css") / FOOTER_CSS['openedx']['ltr'],
+        'output_filename': 'css/lms-footer.css',
     },
-    'style-footer-rtl': {
+    FOOTER_CSS['openedx']['rtl']: {
         'source_filenames': [
             'sass/lms-footer-rtl.css',
         ],
-        'output_filename': path("css") / FOOTER_CSS['openedx']['rtl'],
+        'output_filename': 'css/lms-footer-rtl.css'
     },
-    'style-edx-footer': {
+    FOOTER_CSS['edx']['ltr']: {
         'source_filenames': [
             'sass/lms-footer-edx.css',
         ],
-        'output_filename': path("css") / FOOTER_CSS['edx']['ltr'],
+        'output_filename': 'css/lms-footer-edx.css'
     },
-    'style-edx-footer-rtl': {
+    FOOTER_CSS['edx']['rtl']: {
         'source_filenames': [
             'sass/lms-footer-edx-rtl.css',
         ],
-        'output_filename': path("css") / FOOTER_CSS['edx']['rtl'],
+        'output_filename': 'css/lms-footer-edx-rtl.css'
     },
 }
 

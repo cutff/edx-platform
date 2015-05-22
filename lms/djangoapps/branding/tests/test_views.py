@@ -31,12 +31,12 @@ class TestFooter(TestCase):
     @ddt.data(
         # Open source version
         (False, "application/json", "application/json; charset=utf-8", "Open edX"),
-        (False, "text/html", "text/html; charset=utf-8", settings.FOOTER_CSS['openedx']['ltr']),
+        (False, "text/html", "text/html; charset=utf-8", "lms-footer.css"),
         (False, "text/html", "text/html; charset=utf-8", "Open edX"),
 
         # EdX.org version
         (True, "application/json", "application/json; charset=utf-8", "edX Inc"),
-        (True, "text/html", "text/html; charset=utf-8", settings.FOOTER_CSS['edx']['ltr']),
+        (True, "text/html", "text/html; charset=utf-8", "lms-footer-edx.css"),
         (True, "text/html", "text/html; charset=utf-8", "edX Inc"),
     )
     @ddt.unpack
@@ -121,12 +121,12 @@ class TestFooter(TestCase):
 
     @ddt.data(
         # OpenEdX
-        (False, "en", settings.FOOTER_CSS['openedx']['ltr']),
-        (False, "ar", settings.FOOTER_CSS['openedx']['rtl']),
+        (False, "en", "lms-footer.css"),
+        (False, "ar", "lms-footer-rtl.css"),
 
         # EdX.org
-        (True, "en", settings.FOOTER_CSS['edx']['ltr']),
-        (True, "ar", settings.FOOTER_CSS['edx']['rtl']),
+        (True, "en", "lms-footer-edx.css"),
+        (True, "ar", "lms-footer-edx-rtl.css"),
     )
     @ddt.unpack
     def test_language_rtl(self, is_edx_domain, language, static_path):
