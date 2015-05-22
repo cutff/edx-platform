@@ -554,7 +554,7 @@ class PhotoVerification(StatusModel):
         property to false, so the notification banner can be switched off.
         """
         user = User.objects.get(id=user_id)
-        cls.objects.filter(user=user, status="denied").exclude(window=None).update(display=False)
+        cls.objects.filter(user=user, status="denied").update(display=False)
 
     @classmethod
     def display_status(cls, user):
