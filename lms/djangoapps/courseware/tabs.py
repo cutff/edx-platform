@@ -68,6 +68,24 @@ class SyllabusCourseViewType(EnrolledCourseViewType):
         return hasattr(course, 'syllabus_present') and course.syllabus_present
 
 
+class ProgressCourseViewType(EnrolledCourseViewType):
+    """
+    The course progress view.
+    """
+    name = 'progress'
+    title = _('Progress')
+    priority = 40
+    view_name = 'progress'
+    is_persistent = True
+    is_hideable = True
+
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
+        if not super(ProgressCourseViewType, cls).is_enabled(course, settings, user=user):
+            return False
+        return not course.hide_progress_tab
+
+
 class SingleTextbookTab(CourseTab):
     """
     A tab representing a single textbook.  It is created temporarily when enumerating all textbooks within a

@@ -278,8 +278,6 @@ class CourseTabList(List):
         course.tabs.extend([
             CourseTab.from_json({'type': 'textbooks', 'name': _('Textbooks')}),
             discussion_tab,
-            CourseTab.from_json({'type': 'wiki', 'name': _('Wiki')}),
-            CourseTab.from_json({'type': 'progress', 'name': _('Progress')}),
         ])
 
     @staticmethod

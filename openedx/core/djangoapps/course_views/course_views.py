@@ -126,32 +126,6 @@ class StaffTab(AuthenticatedCourseTab):
         return not user or is_user_staff(course, user)
 
 
-class ProgressTab(EnrolledOrStaffTab):
-    """
-    A tab containing information about the authenticated user's progress.
-    """
-
-    type = 'progress'
-    name = 'progress'
-    priority = None
-
-    def __init__(self, tab_dict=None):
-        super(ProgressTab, self).__init__(
-            # Translators: "Progress" is the name of the student's course progress page
-            name=tab_dict['name'] if tab_dict else _('Progress'),
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-    def is_enabled(self, course, settings, user=None):
-        super_can_display = super(ProgressTab, self).is_enabled(course, settings, user=user)
-        return super_can_display and not course.hide_progress_tab
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        return super(ProgressTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
-
-
 class DiscussionTab(EnrolledOrStaffTab):
     """
     A tab only for the new Berkeley discussion forums.

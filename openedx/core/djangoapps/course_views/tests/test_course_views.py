@@ -3,7 +3,7 @@
 from mock import MagicMock, patch
 import unittest
 
-from courseware.tabs import CoursewareViewType, CourseInfoViewType
+from courseware.tabs import CoursewareViewType, CourseInfoViewType, ProgressCourseViewType
 import xmodule.tabs as xmodule_tabs
 import openedx.core.djangoapps.course_views.course_views as tabs
 from student.models import CourseEnrollment
@@ -75,7 +75,10 @@ class TabTestCase(ModuleStoreTestCase):
             Can be 'None' if the given tab class does not have any keys to validate.
         """
         # create tab
-        tab = tab_class(dict_tab)
+        if issubclass(tab_class, tabs.CourseViewType):
+            return xmodule_tabs.CourseViewTab(tab_class, tab_dict=dict_tab)
+        else:
+            return tab_class(tab_dict=dict_tab)
 
         # name is as expected
         self.assertEqual(tab.name, expected_name)
@@ -209,7 +212,7 @@ class TabListTestCase(TabTestCase):
                 {'type': 'textbooks'},
                 {'type': 'pdf_textbooks'},
                 {'type': 'html_textbooks'},
-                {'type': tabs.ProgressTab.type, 'name': 'fake_name'},
+                {'type': ProgressCourseViewType.name, 'name': 'fake_name'},
                 {'type': tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
                 {'type': 'syllabus'},
             ],
@@ -259,15 +262,16 @@ class ProgressTestCase(TabTestCase):
     def check_progress_tab(self):
         """Helper function for verifying the progress tab."""
         return self.check_tab(
-            tab_class=tabs.ProgressTab,
-            dict_tab={'type': tabs.ProgressTab.type, 'name': 'same'},
+            tab_class=ProgressCourseViewType,
+            dict_tab={'type': ProgressCourseViewType.name, 'name': 'same'},
             expected_link=self.reverse('progress', args=[self.course.id.to_deprecated_string()]),
-            expected_tab_id=tabs.ProgressTab.type,
+            expected_tab_id=ProgressCourseViewType.name,
             invalid_dict_tab=None,
         )
 
-    def test_progress(self):
-
+    @patch('student.models.CourseEnrollment.is_enrolled')
+    def test_progress(self, is_enrolled):
+        is_enrolled.return_value = True
         self.course.hide_progress_tab = False
         tab = self.check_progress_tab()
         self.check_can_display_results(

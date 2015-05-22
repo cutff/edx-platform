@@ -27,6 +27,7 @@ setup(
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardViewType",
             "notes = lms.djangoapps.notes.views:NotesCourseViewType",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookCourseViews",
+            "progress = lms.djangoapps.courseware.tabs:ProgressCourseViewType",
             "syllabus = lms.djangoapps.courseware.tabs:SyllabusCourseViewType",
             "textbooks = lms.djangoapps.courseware.tabs:TextbookCourseViews",
             "wiki = lms.djangoapps.course_wiki.tab:WikiCourseViewType",
@@ -41,7 +42,6 @@ setup(
             "discussion = openedx.core.djangoapps.course_views.course_views:DiscussionTab",
             "external_discussion = openedx.core.djangoapps.course_views.course_views:ExternalDiscussionTab",
             "external_link = openedx.core.djangoapps.course_views.course_views:ExternalLinkTab",
-            "progress = openedx.core.djangoapps.course_views.course_views:ProgressTab",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
