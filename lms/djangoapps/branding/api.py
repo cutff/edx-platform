@@ -17,7 +17,6 @@ import logging
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from staticfiles.storage import staticfiles_storage
-from pipeline_mako import compressed_css
 
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
