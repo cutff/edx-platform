@@ -113,21 +113,6 @@ def courses(request):
     return courseware.views.courses(request)
 
 
-def _footer_css_name():
-    """Return the name of the footer CSS static file.
-
-    This supports right-to-left languages, as well as
-    both OpenEdX and EdX.org.
-
-    Returns: unicode
-
-    """
-    bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
-    version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
-    css_name = settings.FOOTER_CSS[version][bidi]
-    return u"css/{name}".format(name=css_name)
-
-
 def _render_footer_html(show_openedx_logo):
     """Render the footer as HTML.
 
@@ -137,9 +122,14 @@ def _render_footer_html(show_openedx_logo):
     Returns: unicode
 
     """
+    bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
+    version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
+    css_name = u"css/{name}".format(name=settings.FOOTER_CSS[version][bidi])
+
     context = {
         'hide_openedx_link': not show_openedx_logo,
-        'footer_css_url': staticfiles_storage.url(_footer_css_name()),
+        'footer_css_url': staticfiles_storage.url(css_name),
+        'bidi': bidi,
     }
     return (
         render_to_response("footer-edx-v3.html", context)
