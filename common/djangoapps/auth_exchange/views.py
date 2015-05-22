@@ -1,11 +1,11 @@
+# pylint: disable=abstract-method
 """
 Views to support third-party to first-party OAuth 2.0 access token exchange
 """
 from django.conf import settings
 from django.contrib.auth import login
 import django.contrib.auth as auth
-from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from provider import constants
@@ -14,7 +14,7 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 import social.apps.django_app.utils as social_utils
 
-from oauth_exchange.forms import AccessTokenExchangeForm
+from auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
@@ -25,10 +25,10 @@ class AccessTokenExchangeView(AccessTokenView):
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeView, self).dispatch(*args, **kwargs)
 
-    def get(self, request, _backend):
+    def get(self, request, _backend):  # pylint: disable=arguments-differ
         return super(AccessTokenExchangeView, self).get(request)
 
-    def post(self, request, _backend):
+    def post(self, request, _backend):  # pylint: disable=arguments-differ
         form = AccessTokenExchangeForm(request=request, data=request.POST)
         if not form.is_valid():
             return self.error_response(form.errors)
@@ -45,7 +45,7 @@ class AccessTokenExchangeView(AccessTokenView):
         return self.access_token_response(edx_access_token)
 
 
-class SessionCookieExchangeView(APIView):
+class LoginWithAccessTokenView(APIView):
     """
     View for exchanging an access token for session cookies
     """
@@ -61,7 +61,6 @@ class SessionCookieExchangeView(APIView):
             backend = auth.load_backend(backend_path)
             if backend.get_user(user.id):
                 return backend_path
-        return None
 
     @method_decorator(csrf_exempt)
     def post(self, request):

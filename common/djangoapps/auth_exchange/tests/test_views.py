@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Tests for OAuth token exchange views
 """
@@ -14,7 +15,7 @@ import provider.constants
 from provider import scope
 from provider.oauth2.models import AccessToken, Client
 
-from oauth_exchange.tests.utils import AccessTokenExchangeTestMixin
+from auth_exchange.tests.utils import AccessTokenExchangeTestMixin
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
@@ -56,12 +57,15 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
     def test_single_access_token(self):
         def extract_token(response):
+            """
+            Returns the access token from the response payload.
+            """
             return json.loads(response.content)["access_token"]
 
         self._setup_provider_response(success=True)
         for single_access_token in [True, False]:
             with mock.patch(
-                "oauth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
+                "auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
                 single_access_token
             ):
                 first_response = self.client.post(self.url, self.data)
@@ -117,16 +121,20 @@ class AccessTokenExchangeViewTestGoogle(
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
-class TestSessionCookieExchangeView(TestCase):
+class TestLoginWithAccessTokenView(TestCase):
     """
-    Tests for SessionCookieExchangeView
+    Tests for LoginWithAccessTokenView
     """
     def setUp(self):
+        super(TestLoginWithAccessTokenView, self).setUp()
         self.user = UserFactory()
         self.oauth2_client = Client.objects.create(client_type=provider.constants.CONFIDENTIAL)
 
     def _verify_response(self, access_token, expected_status_code, expected_num_cookies):
-        url = reverse("exchange_session_cookie")
+        """
+        Calls the login_with_access_token endpoint and verifies the response given the expected values.
+        """
+        url = reverse("login_with_access_token")
         response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(len(response.cookies), expected_num_cookies)
