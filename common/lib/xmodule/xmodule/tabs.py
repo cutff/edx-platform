@@ -3,6 +3,7 @@ Implement CourseTab
 """
 
 from abc import ABCMeta
+import logging
 
 from xblock.fields import List
 from openedx.core.lib.plugins.api import PluginError
@@ -10,6 +11,8 @@ from openedx.core.lib.plugins.api import PluginError
 # We should only scrape strings for i18n in this file, since the target language is known only when
 # they are rendered in the template.  So ugettext gets called in the template.
 _ = lambda text: text
+
+log = logging.getLogger("edx.courseware")
 
 
 class CourseTab(object):
@@ -165,6 +168,10 @@ class CourseTab(object):
         The subclass that is instantiated is determined by the value of the 'type' key in the
         given dict-type tab. The given dict-type tab is validated before instantiating the CourseTab object.
 
+        If the tab_type is not recognized, then an exception is logged and None is returned.
+        The intention is that the user should still be able to use the course even if a
+        particular tab is not found for some reason.
+
         Args:
             tab: a dictionary with keys for the properties of the tab.
 
@@ -177,11 +184,11 @@ class CourseTab(object):
         try:
             tab_type = CourseViewTypeManager.get_plugin(tab_type_name)
         except PluginError:
-            raise InvalidTabsException(
-                'Unknown tab type {tab_type_name}. Known types: {tab_types}'.format(
-                    tab_type_name=tab_type_name,
-                    tab_types=CourseViewTypeManager.get_course_view_types())
+            log.exception("Unknown tab type {tab_type_name}. Known types: {tab_types}".format(
+                tab_type_name=tab_type_name,
+                tab_types=CourseViewTypeManager.get_course_view_types())
             )
+            return None
         tab_type.validate(tab_dict)
         if issubclass(tab_type, CourseViewType):
             return CourseViewTab(tab_type, tab_dict=tab_dict)
@@ -398,7 +405,12 @@ class CourseTabList(List):
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
         self.validate_tabs(values)
-        return [CourseTab.from_json(tab_dict) for tab_dict in values]
+        tabs = []
+        for tab_dict in values:
+            tab = CourseTab.from_json(tab_dict)
+            if tab:
+                tabs.append(tab)
+        return tabs
 
 
 # Validators

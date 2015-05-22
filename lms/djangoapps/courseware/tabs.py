@@ -5,12 +5,53 @@ perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager, CourseViewType
+from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, CourseViewTab
 
 
-class SyllabusCourseView(CourseViewType):
+class EnrolledCourseViewType(CourseViewType):
+    """
+    A base class for any view types that require a user to be enrolled.
+    """
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):
+        if not user:
+            return True
+        return CourseEnrollment.is_enrolled(user, course.id) or has_access(user, 'staff', course, course.id)
+
+
+class CoursewareViewType(EnrolledCourseViewType):
+    """
+    The main courseware view.
+    """
+    name = 'courseware'
+    title = _('Courseware')
+    priority = 10
+    view_name = 'courseware'
+    is_persistent = True
+    is_movable = False
+
+
+class CourseInfoViewType(CourseViewType):
+    """
+    The course info view.
+    """
+    name = 'course_info'
+    title = _('Course Info')
+    priority = 20
+    view_name = 'info'
+    is_persistent = True
+    is_movable = False
+
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):
+        return True
+
+
+class SyllabusCourseViewType(EnrolledCourseViewType):
     """
     A tab for the course syllabus.
     """
@@ -22,6 +63,8 @@ class SyllabusCourseView(CourseViewType):
 
     @classmethod
     def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
+        if not super(SyllabusCourseViewType, cls).is_enabled(course, settings, user=user):
+            return False
         return hasattr(course, 'syllabus_present') and course.syllabus_present
 
 

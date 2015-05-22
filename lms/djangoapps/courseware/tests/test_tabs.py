@@ -236,13 +236,6 @@ class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         self.course = CourseFactory.create()
         self.set_up_books(2)
-        self.course.tabs = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            xmodule_tabs.CourseTab.from_json({'type': 'textbooks'}),
-            xmodule_tabs.CourseTab.from_json({'type': 'pdf_textbooks'}),
-            xmodule_tabs.CourseTab.from_json({'type': 'html_textbooks'}),
-        ]
         self.setup_user()
         self.enroll(self.course)
         self.num_textbook_tabs = sum(1 for tab in self.course.tabs if tab.type in [

@@ -3,8 +3,11 @@
 from mock import MagicMock, patch
 import unittest
 
+from courseware.tabs import CoursewareViewType, CourseInfoViewType
 import xmodule.tabs as xmodule_tabs
 import openedx.core.djangoapps.course_views.course_views as tabs
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -168,19 +171,17 @@ class TabListTestCase(TabTestCase):
         # invalid tabs
         self.invalid_tabs = [
             # less than 2 tabs
-            [{'type': 'courseware'}],
+            [{'type': CoursewareViewType.name}],
             # missing course_info
-            [{'type': 'courseware'}, {'type': 'discussion', 'name': 'fake_name'}],
+            [{'type': CoursewareViewType.name}, {'type': 'discussion', 'name': 'fake_name'}],
             # incorrect order
-            [{'type': 'course_info', 'name': 'fake_name'}, {'type': 'courseware'}],
-            # invalid type
-            [{'type': 'courseware'}, {'type': 'course_info', 'name': 'fake_name'}, {'type': 'fake_type'}],
+            [{'type': CourseInfoViewType.name, 'name': 'fake_name'}, {'type': CoursewareViewType.name}],
         ]
 
         # tab types that should appear only once
         unique_tab_types = [
-            tabs.CourseInfoTab.type,
-            tabs.CoursewareTab.type,
+            CoursewareViewType.name,
+            CourseInfoViewType.name,
             'textbooks',
             'pdf_textbooks',
             'html_textbooks',
@@ -188,8 +189,8 @@ class TabListTestCase(TabTestCase):
 
         for unique_tab_type in unique_tab_types:
             self.invalid_tabs.append([
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
                 # add the unique tab multiple times
                 {'type': unique_tab_type},
                 {'type': unique_tab_type},
@@ -201,8 +202,8 @@ class TabListTestCase(TabTestCase):
             [],
             # all valid tabs
             [
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
                 {'type': tabs.DiscussionTab.type, 'name': 'fake_name'},
                 {'type': tabs.ExternalLinkTab.type, 'name': 'fake_name', 'link': 'fake_link'},
                 {'type': 'textbooks'},
@@ -214,8 +215,8 @@ class TabListTestCase(TabTestCase):
             ],
             # with external discussion
             [
-                {'type': tabs.CoursewareTab.type},
-                {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
                 {'type': tabs.ExternalDiscussionTab.type, 'name': 'fake_name', 'link': 'fake_link'}
             ],
         ]
@@ -235,6 +236,21 @@ class ValidateTabsTestCase(TabListTestCase):
         for valid_tab_list in self.valid_tabs:
             from_json_result = tab_list.from_json(valid_tab_list)
             self.assertEquals(len(from_json_result), len(valid_tab_list))
+
+    def test_invalid_tab_type(self):
+        """
+        Verifies that having an unrecognized tab type does not cause
+        the tabs to be undisplayable.
+        """
+        tab_list = xmodule_tabs.CourseTabList()
+        self.assertEquals(
+            len(tab_list.from_json([
+                {'type': CoursewareViewType.name},
+                {'type': CourseInfoViewType.name, 'name': 'fake_name'},
+                {'type': 'no_such_type'}
+            ])),
+            2
+        )
 
 
 class ProgressTestCase(TabTestCase):
@@ -442,7 +458,8 @@ class CourseTabListTestCase(TabListTestCase):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
         # enumerate the tabs with a staff user
-        user = self.create_mock_user(is_authenticated=True, is_staff=True, is_enrolled=True)
+        user = UserFactory(is_staff=True)
+        CourseEnrollment.enroll(user, self.course.id)
         for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(
                 self.course,
                 self.settings,
@@ -487,13 +504,9 @@ class DiscussionLinkTestCase(TabTestCase):
         super(DiscussionLinkTestCase, self).setUp()
 
         self.tabs_with_discussion = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
             tabs.DiscussionTab(),
         ]
         self.tabs_without_discussion = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
         ]
 
     @staticmethod

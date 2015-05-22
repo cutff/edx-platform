@@ -75,7 +75,7 @@ class StaffGradingTab(CourseViewType):
     is_persistent = True
 
     @classmethod
-    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
         if not user:
             return True
         if "combinedopenended" not in course.advanced_modules:

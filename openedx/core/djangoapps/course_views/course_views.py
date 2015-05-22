@@ -20,13 +20,14 @@ class CourseViewType(object):
     """
     name = None
     title = None
+    priority = None
     view_name = None
+    is_movable = True
     is_persistent = False
     is_hideable = False
-    priority = None
 
     @classmethod
-    def is_enabled(cls, course, settings, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
         """Returns true if this course view is enabled in the course.
 
         Args:
@@ -123,48 +124,6 @@ class StaffTab(AuthenticatedCourseTab):
     """
     def is_enabled(self, course, settings, user=None):  # pylint: disable=unused-argument
         return not user or is_user_staff(course, user)
-
-
-class CoursewareTab(EnrolledOrStaffTab):
-    """
-    A tab containing the course content.
-    """
-
-    type = 'courseware'
-    name = 'courseware'
-    is_movable = False
-    priority = 10
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(CoursewareTab, self).__init__(
-            # Translators: 'Courseware' refers to the tab in the courseware that leads to the content of a course
-            name=_('Courseware'),  # support fixed name for the courseware tab
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-
-class CourseInfoTab(CourseTab):
-    """
-    A tab containing information about the course.
-    """
-
-    type = 'course_info'
-    name = 'course_info'
-    is_movable = False
-    priority = 20
-
-    def __init__(self, tab_dict=None):
-        super(CourseInfoTab, self).__init__(
-            # Translators: "Course Info" is the name of the course's information and updates page
-            name=tab_dict['name'] if tab_dict else _('Course Info'),
-            tab_id='info',
-            link_func=link_reverse_func('info'),
-        )
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        return super(CourseInfoTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
 
 
 class ProgressTab(EnrolledOrStaffTab):

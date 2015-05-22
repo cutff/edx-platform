@@ -6,11 +6,11 @@ a user has on an article.
 from django.utils.translation import ugettext as _
 
 from courseware.access import has_access
-from openedx.core.djangoapps.course_views.course_views import CourseViewType
+from courseware.tabs import EnrolledCourseViewType
 from student.models import CourseEnrollment
 
 
-class WikiCourseViewType(CourseViewType):
+class WikiCourseViewType(EnrolledCourseViewType):
     """
     Defines the Wiki view type that is shown as a course tab.
     """
@@ -22,11 +22,13 @@ class WikiCourseViewType(CourseViewType):
     is_hideable = True
 
     @classmethod
-    def is_enabled(cls, course, settings, user=None):  # pylint: disable=redefined-outer-name
+    def is_enabled(cls, course, django_settings, user=None):
         """
         Returns true if the wiki is enabled and the specified user is enrolled or has staff access.
         """
-        if not settings.WIKI_ENABLED:
+        if not super(WikiCourseViewType, cls).is_enabled(course, django_settings, user=user):
+            return False
+        if not django_settings.WIKI_ENABLED:
             return False
         if not user or course.allow_public_wiki_access:
             return True

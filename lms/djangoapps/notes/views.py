@@ -35,7 +35,7 @@ def notes(request, course_id):
     return render_to_response('notes.html', context)
 
 
-class NotesCourseView(CourseViewType):
+class NotesCourseViewType(CourseViewType):
     """
     A tab for the course notes.
     """
