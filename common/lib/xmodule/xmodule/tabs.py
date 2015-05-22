@@ -204,6 +204,7 @@ class CourseViewTab(CourseTab):
         self.course_view_type = course_view_type
         self.is_hideable = course_view_type.is_hideable
         self.is_hidden = tab_dict.get('is_hidden', False) if tab_dict else False
+        self.is_collection = course_view_type.is_collection if hasattr(course_view_type, 'is_collection') else False
 
     def is_enabled(self, course, settings, user=None):
         if not super(CourseViewTab, self).is_enabled(course, settings, user=user):
@@ -227,6 +228,11 @@ class CourseViewTab(CourseTab):
         if self.is_hidden:
             to_json_val.update({'is_hidden': True})
         return to_json_val
+
+    def items(self, course):
+        """ If this tab is a collection, this will fetch the items in the collection. """
+        for item in self.course_view_type.items(course):
+            yield item
 
 
 class CourseTabList(List):

@@ -23,7 +23,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import CourseTab
-from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager, PDFTextbookTabs
+from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -1209,8 +1209,8 @@ def textbooks_list_handler(request, course_key_string):
                     textbook["id"] = tid
                     tids.add(tid)
 
-            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-                course.tabs.append(PDFTextbookTabs())
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
+                course.tabs.append(CourseTab.from_json({'type': 'pdf_textbooks'}))
             course.pdf_textbooks = textbooks
             store.update_item(course, request.user.id)
             return JsonResponse(course.pdf_textbooks)
@@ -1226,8 +1226,8 @@ def textbooks_list_handler(request, course_key_string):
             existing = course.pdf_textbooks
             existing.append(textbook)
             course.pdf_textbooks = existing
-            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-                course.tabs.append(PDFTextbookTabs())
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
+                course.tabs.append(CourseTab.from_json({'type': 'pdf_textbooks'}))
             store.update_item(course, request.user.id)
             resp = JsonResponse(textbook, status=201)
             resp["Location"] = reverse_course_url(

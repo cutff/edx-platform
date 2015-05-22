@@ -181,9 +181,9 @@ class TabListTestCase(TabTestCase):
         unique_tab_types = [
             tabs.CourseInfoTab.type,
             tabs.CoursewareTab.type,
-            tabs.TextbookTabs.type,
-            tabs.PDFTextbookTabs.type,
-            tabs.HtmlTextbookTabs.type,
+            'textbooks',
+            'pdf_textbooks',
+            'html_textbooks',
         ]
 
         for unique_tab_type in unique_tab_types:
@@ -205,9 +205,9 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.CourseInfoTab.type, 'name': 'fake_name'},
                 {'type': tabs.DiscussionTab.type, 'name': 'fake_name'},
                 {'type': tabs.ExternalLinkTab.type, 'name': 'fake_name', 'link': 'fake_link'},
-                {'type': tabs.TextbookTabs.type},
-                {'type': tabs.PDFTextbookTabs.type},
-                {'type': tabs.HtmlTextbookTabs.type},
+                {'type': 'textbooks'},
+                {'type': 'pdf_textbooks'},
+                {'type': 'html_textbooks'},
                 {'type': tabs.ProgressTab.type, 'name': 'fake_name'},
                 {'type': tabs.StaticTab.type, 'name': 'fake_name', 'url_slug': 'schlug'},
                 {'type': 'syllabus'},
@@ -310,13 +310,13 @@ class TextbooksTestCase(TabTestCase):
 
         self.dict_tab = MagicMock()
         self.course.tabs = [
-            tabs.CoursewareTab(),
-            tabs.CourseInfoTab(),
-            tabs.TextbookTabs(),
-            tabs.PDFTextbookTabs(),
-            tabs.HtmlTextbookTabs(),
+            xmodule_tabs.CourseTab.from_json({'type': 'textbooks'}),
+            xmodule_tabs.CourseTab.from_json({'type': 'pdf_textbooks'}),
+            xmodule_tabs.CourseTab.from_json({'type': 'html_textbooks'}),
         ]
-        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
+        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if tab.type in [
+            'textbooks', 'pdf_textbooks', 'html_textbooks'
+        ])
         self.num_textbooks = self.num_textbook_tabs * len(self.books)
 
     @patch('openedx.core.djangoapps.course_views.course_views.is_user_enrolled_or_staff')
@@ -330,7 +330,7 @@ class TextbooksTestCase(TabTestCase):
         user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
         for tab in xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, user=user):
             # verify all textbook type tabs
-            if isinstance(tab, tabs.SingleTextbookTab):
+            if tab.type == 'single_textbook':
                 book_type, book_index = tab.tab_id.split("/", 1)
                 expected_link = self.reverse(
                     type_to_reverse_name[book_type],
@@ -340,12 +340,6 @@ class TextbooksTestCase(TabTestCase):
                 self.assertTrue(tab.name.startswith('Book{0}'.format(book_index)))
                 num_textbooks_found = num_textbooks_found + 1
         self.assertEquals(num_textbooks_found, self.num_textbooks)
-
-    def test_textbooks_disabled(self):
-
-        self.settings.FEATURES['ENABLE_TEXTBOOK'] = False
-        tab = tabs.TextbookTabs(self.dict_tab)
-        self.check_can_display_results(tab, for_authenticated_users_only=True, expected_value=False)
 
 
 class KeyCheckerTestCase(unittest.TestCase):
@@ -463,14 +457,14 @@ class CourseTabListTestCase(TabListTestCase):
 
         # test including non-empty collections
         self.assertIn(
-            tabs.HtmlTextbookTabs(),
+            {'type': 'html_textbooks'},
             list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
         # test not including empty collections
         self.course.html_textbooks = []
         self.assertNotIn(
-            tabs.HtmlTextbookTabs(),
+            {'type': 'html_textbooks'},
             list(xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.settings, inline_collections=False)),
         )
 
@@ -496,12 +490,10 @@ class DiscussionLinkTestCase(TabTestCase):
             tabs.CoursewareTab(),
             tabs.CourseInfoTab(),
             tabs.DiscussionTab(),
-            tabs.TextbookTabs(),
         ]
         self.tabs_without_discussion = [
             tabs.CoursewareTab(),
             tabs.CourseInfoTab(),
-            tabs.TextbookTabs(),
         ]
 
     @staticmethod

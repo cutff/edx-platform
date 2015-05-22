@@ -7,10 +7,10 @@ from django.utils.translation import ugettext as _
 
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.djangoapps.course_views.course_views import CourseViewTypeManager, CourseViewType
-from xmodule.tabs import CourseTabList, CourseViewTab
+from xmodule.tabs import CourseTab, CourseTabList, CourseViewTab
 
 
-class SyllabusTab(CourseViewType):
+class SyllabusCourseView(CourseViewType):
     """
     A tab for the course syllabus.
     """
@@ -23,6 +23,103 @@ class SyllabusTab(CourseViewType):
     @classmethod
     def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
         return hasattr(course, 'syllabus_present') and course.syllabus_present
+
+
+class SingleTextbookTab(CourseTab):
+    """
+    A tab representing a single textbook.  It is created temporarily when enumerating all textbooks within a
+    Textbook collection tab.  It should not be serialized or persisted.
+    """
+    type = 'single_textbook'
+    is_movable = False
+    is_collection_item = True
+    priority = None
+
+    def to_json(self):
+        raise NotImplementedError('SingleTextbookTab should not be serialized.')
+
+
+class TextbookCourseViewsBase(CourseViewType):
+    """
+    Abstract class for textbook collection tabs classes.
+    """
+    # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
+    title = _("Textbooks")
+    is_collection = True
+
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
+        return user is None or user.is_authenticated()
+
+    @classmethod
+    def items(cls, course):
+        """
+        A generator for iterating through all the SingleTextbookTab book objects associated with this
+        collection of textbooks.
+        """
+        raise NotImplementedError()
+
+
+class TextbookCourseViews(TextbookCourseViewsBase):
+    """
+    A tab representing the collection of all textbook tabs.
+    """
+    name = 'textbooks'
+    priority = None
+
+    @classmethod
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
+        parent_is_enabled = super(TextbookCourseViews, cls).is_enabled(course, settings, user)
+        return django_settings.FEATURES.get('ENABLE_TEXTBOOK') and parent_is_enabled
+
+    @classmethod
+    def items(cls, course):
+        for index, textbook in enumerate(course.textbooks):
+            yield SingleTextbookTab(
+                name=textbook.title,
+                tab_id='textbook/{0}'.format(index),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'book', args=[course.id.to_deprecated_string(), index]
+                ),
+            )
+
+
+class PDFTextbookCourseViews(TextbookCourseViewsBase):
+    """
+    A tab representing the collection of all PDF textbook tabs.
+    """
+    name = 'pdf_textbooks'
+    priority = None
+
+    @classmethod
+    def items(cls, course):
+        for index, textbook in enumerate(course.pdf_textbooks):
+            yield SingleTextbookTab(
+                name=textbook['tab_title'],
+                tab_id='pdftextbook/{0}'.format(index),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'pdf_book', args=[course.id.to_deprecated_string(), index]
+                ),
+            )
+
+
+class HtmlTextbookCourseViews(TextbookCourseViewsBase):
+    """
+    A tab representing the collection of all Html textbook tabs.
+    """
+    name = 'html_textbooks'
+    priority = None
+
+    @classmethod
+    def items(cls, course):
+        for index, textbook in enumerate(course.html_textbooks):
+            yield SingleTextbookTab(
+                name=textbook['tab_title'],
+                tab_id='htmltextbook/{0}'.format(index),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'html_book', args=[course.id.to_deprecated_string(), index]
+                ),
+            )
 
 
 def get_course_tab_list(request, course):
