@@ -316,7 +316,6 @@ class PhotoVerification(StatusModel):
                 )
 
             # If someone is denied their original verification attempt, they can try to reverify.
-            # However, if a midcourse reverification is denied, that denial is permanent.
             if attempt.status == 'denied':
                 status = 'must_reverify'
 
