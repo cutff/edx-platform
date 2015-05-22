@@ -4,6 +4,7 @@
   from branding.api import get_footer
 %>
 <% footer = get_footer(is_secure=is_secure) %>
+<%namespace name='static' file='static_content.html'/>
 
 ## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
 <footer id="footer-edx-v3" role="contentinfo" aria-label="${_("Page Footer")}">
@@ -61,7 +62,5 @@
 % if footer_css_url:
 <link type="text/css" rel="stylesheet" href="${footer_css_url}"></link>
 % endif
-% if footer_js_url:
-<script type="text/javascript" src="${footer_js_url}"></script>
-% endif
+<script type="text/javascript" src="${static.url('js/footer-edx.js')}"></script>
 

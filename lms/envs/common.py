@@ -1055,9 +1055,8 @@ FOOTER_OPENEDX_LOGO_IMAGE = "https://files.edx.org/openedx-logos/edx-openedx-log
 FOOTER_ORGANIZATION_IMAGE = "images/default-theme/logo.png"
 
 # These are referred to both by the Django asset pipeline
-# AND by the branding footer API, which uses an internal
-# redirect to serve these files.
-FOOTER_JS = "footer.js"
+# AND by the branding footer API, which needs to decide which
+# version of the CSS to serve.
 FOOTER_CSS = {
     "openedx": {
         "ltr": "lms-footer.css",
@@ -1487,8 +1486,8 @@ PIPELINE_JS = {
         'output_filename': 'js/ccx.js'
     },
     'footer_edx': {
-        'source_filenames': ['js/footer.js'],
-        'output_filename': path("js") / FOOTER_JS,
+        'source_filenames': ['js/footer-edx.js'],
+        'output_filename': 'js/footer-edx.js',
     }
 }
 

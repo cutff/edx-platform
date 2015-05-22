@@ -140,7 +140,6 @@ def _render_footer_html(show_openedx_logo):
     context = {
         'hide_openedx_link': not show_openedx_logo,
         'footer_css_url': staticfiles_storage.url(_footer_css_name()),
-        'footer_js_url': staticfiles_storage.url(u"js/{name}".format(name=settings.FOOTER_JS)),
     }
     return (
         render_to_response("footer-edx-v3.html", context)

@@ -32,13 +32,11 @@ class TestFooter(TestCase):
         # Open source version
         (False, "application/json", "application/json; charset=utf-8", "Open edX"),
         (False, "text/html", "text/html; charset=utf-8", settings.FOOTER_CSS['openedx']['ltr']),
-        (False, "text/html", "text/html; charset=utf-8", settings.FOOTER_JS),
         (False, "text/html", "text/html; charset=utf-8", "Open edX"),
 
         # EdX.org version
         (True, "application/json", "application/json; charset=utf-8", "edX Inc"),
         (True, "text/html", "text/html; charset=utf-8", settings.FOOTER_CSS['edx']['ltr']),
-        (True, "text/html", "text/html; charset=utf-8", settings.FOOTER_JS),
         (True, "text/html", "text/html; charset=utf-8", "edX Inc"),
     )
     @ddt.unpack

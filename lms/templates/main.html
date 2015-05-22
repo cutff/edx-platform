@@ -152,20 +152,7 @@ dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
           % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
             ## TODO (ECOM-1339): Remove this check to permanently enable the V3 footer.
             % if branding_api.is_enabled():
-              ## The EdX branded footer appears on other sites (e.g. marketing and blog).
-              ## We load it here the same way we load it on other sites:
-              ## by including JavaScript that loads the footer HTML into the DOM.
-              <div id="edx-branding-footer"></div>
-              <script type="text/javascript">
-                $.ajax({
-                    url: '/api/v1/branding/footer?show-openedx-logo=1',
-                    type: 'GET',
-                    dataType: 'html',
-                    success: function( data ) {
-                        $(data).replaceAll($('#edx-branding-footer'));
-                    }
-                });
-              </script>
+              <%include file="footer-edx-v3.html" />
             % else:
               <%include file="footer-edx-v2.html" />
             % endif
