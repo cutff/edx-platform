@@ -52,7 +52,7 @@ class TabsPageTests(CourseTestCase):
             self.client.ajax_post(
                 self.url,
                 data=json.dumps({
-                    'tab_id_locator': {'tab_id': self.course.tabs[0]},
+                    'tab_id_locator': {'tab_id': 'tab'},
                     'unsupported_request': None,
                 }),
             )

@@ -22,6 +22,7 @@ from notes import utils, api, models
 
 
 class UtilsTest(ModuleStoreTestCase):
+    """ Tests for the notes utils. """
     def setUp(self):
         '''
         Setup a dummy course-like object with a tabs field that can be
@@ -61,6 +62,7 @@ class CourseTabTest(ModuleStoreTestCase):
         self.user = UserFactory()
 
     def has_notes_tab(self, course, user):
+        """ Returns true if the current course and user have a notes tab, false otherwise. """
         request = RequestFactory().request()
         request.user = user
         all_tabs = get_course_tab_list(request, course)
@@ -81,6 +83,7 @@ class CourseTabTest(ModuleStoreTestCase):
     def test_course_tab_visible(self):
         self.course.advanced_modules = ["notes"]
         self.assertTrue(self.has_notes_tab(self.course, self.user))
+
 
 class ApiTest(TestCase):
 

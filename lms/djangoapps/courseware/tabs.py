@@ -21,7 +21,7 @@ class SyllabusTab(CourseViewType):
     is_persistent = False
 
     @classmethod
-    def is_enabled(self, course, settings, user=None):
+    def is_enabled(cls, course, django_settings, user=None):  # pylint: disable=unused-argument
         return hasattr(course, 'syllabus_present') and course.syllabus_present
 
 

@@ -287,6 +287,7 @@ class SyllabusTestCase(ModuleStoreTestCase):
         self.user = UserFactory()
 
     def has_syllabus_tab(self):
+        """ Returns True if the current course has a syllabus tab, False otherwise """
         request = RequestFactory().request()
         request.user = self.user
         all_tabs = get_course_tab_list(request, self.course)

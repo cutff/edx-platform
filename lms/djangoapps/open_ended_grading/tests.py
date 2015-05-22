@@ -20,7 +20,6 @@ from xblock.fields import ScopeIds
 
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tabs import get_course_tab_list
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from student.models import unique_id_for_user

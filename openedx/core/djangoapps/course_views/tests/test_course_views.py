@@ -388,10 +388,12 @@ class NeedNameTestCase(unittest.TestCase):
 class CourseTabListTestCase(TabListTestCase):
     """Testing the generator method for iterating through displayable tabs"""
 
-    def has_syllabus_tab(self, tabs):
-        for tab in tabs:
-            if tab.type == 'syllabus':
+    def has_syllabus_tab(self, tab_list):
+        """ Returns true if a Syllabus tab exists in the given tab list. """
+        for tab in tab_list:
+            if tab.name == 'Syllabus':
                 return True
+        return False
 
     def test_initialize_default_without_syllabus(self):
         self.course.tabs = []
@@ -512,12 +514,12 @@ class DiscussionLinkTestCase(TabTestCase):
         return reverse_discussion_link
 
     def check_discussion(
-        self, tab_list,
-        expected_discussion_link,
-        expected_can_display_value,
-        discussion_link_in_course="",
-        is_staff=True,
-        is_enrolled=True,
+            self, tab_list,
+            expected_discussion_link,
+            expected_can_display_value,
+            discussion_link_in_course="",
+            is_staff=True,
+            is_enrolled=True,
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list

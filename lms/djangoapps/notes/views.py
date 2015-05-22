@@ -45,7 +45,7 @@ class NotesTab(CourseViewType):
     is_persistent = False
 
     @classmethod
-    def is_enabled(self, course, settings, user=None):
+    def is_enabled(cls, course, settings, user=None):
         if "notes" not in course.advanced_modules:
             return False
         return settings.FEATURES.get('ENABLE_STUDENT_NOTES') and (user is None or user.is_authenticated())
